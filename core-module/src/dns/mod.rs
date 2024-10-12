@@ -1,6 +1,6 @@
 use std::net::Ipv4Addr;
 use std::result::Result;
-use std::io;
+use std::io::Error;
 
 pub struct BytePacketBuffer {
     pub buf: [u8; 512],
@@ -24,21 +24,21 @@ impl BytePacketBuffer {
     }
 
     /// Step the buffer position forward a specific number of steps
-    pub fn step(&mut self, steps: usize) -> Result<(), io::Error> {
+    pub fn step(&mut self, steps: usize) -> Result<(), Error> {
         self.pos += steps;
 
         Ok(())
     }
 
     /// Change the buffer position
-    pub fn seek(&mut self, pos: usize) -> Result<(), io::Error> {
+    pub fn seek(&mut self, pos: usize) -> Result<(), Error> {
         self.pos = pos;
 
         Ok(())
     }
 
     /// Read a single byte and move the position one step forward
-    pub fn read(&mut self) -> Result<u8, io::Error> {
+    pub fn read(&mut self) -> Result<u8, Error> {
         if self.pos >= 512 {
             return Err("End of buffer".into());
         }
@@ -49,7 +49,7 @@ impl BytePacketBuffer {
     }
 
     /// Get a single byte, without changing the buffer position
-    pub fn get(&mut self, pos: usize) -> Result<u8, io::Error> {
+    pub fn get(&mut self, pos: usize) -> Result<u8, Error> {
         if pos >= 512 {
             return Err("End of buffer".into());
         }
@@ -57,7 +57,7 @@ impl BytePacketBuffer {
     }
 
     /// Get a range of bytes
-    pub fn get_range(&mut self, start: usize, len: usize) -> Result<&[u8], io::Error> {
+    pub fn get_range(&mut self, start: usize, len: usize) -> Result<&[u8], Box<dyn Error>> {
         if start + len >= 512 {
             return Err("End of buffer".into());
         }
