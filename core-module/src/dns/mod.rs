@@ -1,6 +1,7 @@
 use std::net::Ipv4Addr;
 use std::result::Result;
 use std::io::Error;
+use std::error::Error;
 
 pub struct BytePacketBuffer {
     pub buf: [u8; 512],
@@ -65,14 +66,14 @@ impl BytePacketBuffer {
     }
 
     /// Read two bytes, stepping two steps forward
-    pub fn read_u16(&mut self) -> Result<u16, io::Error> {
+    pub fn read_u16(&mut self) -> Result<u16, Error> {
         let res = ((self.read()? as u16) << 8) | (self.read()? as u16);
 
         Ok(res)
     }
 
     /// Read four bytes, stepping four steps forward
-    pub fn read_u32(&mut self) -> Result<u32, io::Error> {
+    pub fn read_u32(&mut self) -> Result<u32, Error> {
         let res = ((self.read()? as u32) << 24)
             | ((self.read()? as u32) << 16)
             | ((self.read()? as u32) << 8)
@@ -87,7 +88,7 @@ impl BytePacketBuffer {
     /// The tricky part: Reading domain names, taking labels into consideration.
     /// Will take something like [3]www[6]google[3]com[0] and append
     /// www.google.com to outstr.
-    pub fn read_qname(&mut self, outstr: &mut String) -> Result<(), io::Error> {
+    pub fn read_qname(&mut self, outstr: &mut String) -> Result<(), Error> {
         // Since we might encounter jumps, we'll keep track of our position
         // locally as opposed to using the position within the struct. This
         // allows us to move the shared position to a point past our current
